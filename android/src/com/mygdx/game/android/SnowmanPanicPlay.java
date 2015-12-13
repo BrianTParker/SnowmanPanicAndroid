@@ -63,13 +63,13 @@ public class SnowmanPanicPlay extends Game {
 
 
             if(Gdx.input.isTouched()) {
-                if(Gdx.input.getX() > Gdx.graphics.getWidth()/2){
+                if(Gdx.input.getX() >= player.getPosx() + (player.getWidth())){
                     if(player.getPosx() <= Gdx.graphics.getWidth() - player.getWidth()){
                         player.moveRight(player.getSpeed());
                     }
 
 
-                }else{
+                }else if (Gdx.input.getX() <= player.getPosx() + 30){
                     if(player.getPosx() >= 0){
                         player.moveLeft(player.getSpeed());
                     }
