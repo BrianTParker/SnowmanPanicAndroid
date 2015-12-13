@@ -6,6 +6,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -38,10 +40,16 @@ public class SnowmanPanicPlay extends Game {
     long startTime;
     long currentTime;
 
+    Sound hitSound;
+    Sound snowflakeSound;
+    Music menuSong;
+    Music mainSong;
+    Music deathSong;
+
     @Override
     public void create () {
         gameState = GameState.MENU;
-        player = new PlayerObject("images/snowman.png", 10, Gdx.graphics.getWidth()/2 - 156/2, 237 + 50, 156, 237);
+        player = new PlayerObject("images/snowman.png", 12, Gdx.graphics.getWidth()/2 - 156/2, 237 + 50, 156, 237);
         dropList = new ArrayList();
         for(int i = 0; i < 7; i++){
             RainDropObject newDrop = new RainDropObject("images/drop.png", 13, 0, 0, 20, 40);
@@ -61,6 +69,15 @@ public class SnowmanPanicPlay extends Game {
         snowflake.getRandomPosition();
 
         dropSnowflake = false;
+
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("sfx/hit.wav"));
+        snowflakeSound = Gdx.audio.newSound(Gdx.files.internal("sfx/snowflake.wav"));
+        menuSong = Gdx.audio.newMusic(Gdx.files.internal("music/menutrack.mp3"));
+        menuSong.setLooping(true);
+        mainSong = Gdx.audio.newMusic(Gdx.files.internal("music/mainsong.mp3"));
+        mainSong.setLooping(true);
+        deathSong = Gdx.audio.newMusic(Gdx.files.internal("music/deadtrack.mp3"));
+        deathSong.setLooping(true);
     }
 
     @Override
@@ -72,9 +89,19 @@ public class SnowmanPanicPlay extends Game {
 
 
 
-
+        if(gameState == GameState.MENU && !menuSong.isPlaying()){
+            menuSong.play();
+        }
 
         if(gameState == GameState.PLAY){
+
+            if(menuSong.isPlaying()){
+                menuSong.stop();
+                menuSong.dispose();
+            }
+            if(!mainSong.isPlaying()){
+                mainSong.play();
+            }
 
 
             long tDelta = (currentTime - startTime)/1000;
@@ -120,6 +147,7 @@ public class SnowmanPanicPlay extends Game {
                 if(checkForCollision(snowflake) == true){
                     dropSnowflake = false;
                     player.addHealth();
+                    snowflakeSound.play();
                 }else if(snowflake.getPosy() <= 0){
                     dropSnowflake = false;
                 }
@@ -135,6 +163,11 @@ public class SnowmanPanicPlay extends Game {
                 if(checkForCollision(drop) == true && justGotHit == false){
                     player.subtractHealth();
                     justGotHit = true;
+                    hitSound.play();
+
+                    if(player.getHealth() == 0){
+                        gameState = GameState.DEATH;
+                    }
                 }
             }
 
@@ -167,6 +200,22 @@ public class SnowmanPanicPlay extends Game {
             if(dropSnowflake == true){
                 batch.draw(snowflake.getImage(), snowflake.getPosx(), snowflake.getPosy());
             }
+            batch.end();
+        }
+
+        if(gameState == GameState.DEATH){
+            mainSong.stop();
+            mainSong.dispose();
+            if(deathSong.isPlaying() == false){
+                deathSong.play();
+            }
+
+
+
+            Gdx.gl.glClearColor(.1f, .3f, .5f, 0);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            batch.begin();
+            batch.draw(player.getImage(), player.getPosx(), player.getPosy());
             batch.end();
         }
 
