@@ -34,6 +34,7 @@ public class PlayerObject extends GameObject {
         if(health < 0){
             health = 0;
         }
+        this.updateImage();
     }
 
     public void addHealth(){
@@ -41,25 +42,26 @@ public class PlayerObject extends GameObject {
         if(health > 3){
             health = 3;
         }
+        this.updateImage();
     }
 
     public void updateImage(){
         if(health == 3){
             image = new Texture("images/snowman.png");
             height = 237;
-            posy = height;
+
         }else if(health == 2){
             image = new Texture("images/slightly_melted2.png");
             height = 210;
-            posy = height;
+
         }else if(health == 1){
             image = new Texture("images/mostly_melted2.png");
             height = 140;
-            posy = height;
+
         }else if(health == 0){
             image = new Texture("images/melted.png");
             height = 237;
-            posy = height;
+
         }
     }
 }

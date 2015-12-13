@@ -22,7 +22,7 @@ public class RainDropObject extends GameObject {
     public void getRandomPosition(){
 
         this.posx = getRandomInt(10, Gdx.graphics.getWidth() - 40);
-        this.posy = getRandomInt(Gdx.graphics.getHeight() + 100, Gdx.graphics.getHeight() + 500);
+        this.posy = getRandomInt(Gdx.graphics.getHeight() + 100, Gdx.graphics.getHeight() + 900);
 
 
     }
