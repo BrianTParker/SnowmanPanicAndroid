@@ -1,15 +1,18 @@
 package com.mygdx.game.android;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -21,9 +24,11 @@ import java.util.ArrayList;
  */
 public class SnowmanPanicPlay extends Game {
 
-    public enum GameState {MENU, PLAY, DEATH}
+    public enum GameState {MENU, PLAY, DEATH, RESET}
 
     public static GameState gameState = GameState.MENU;
+
+    Integer timeDisplay;
 
     PlayerObject player;
     SpriteBatch batch;
@@ -45,6 +50,15 @@ public class SnowmanPanicPlay extends Game {
     Music menuSong;
     Music mainSong;
     Music deathSong;
+
+    BitmapFont font;
+
+    @Override
+    public void dispose(){
+        menuSong.dispose();
+        mainSong.dispose();
+        deathSong.dispose();
+    }
 
     @Override
     public void create () {
@@ -78,6 +92,15 @@ public class SnowmanPanicPlay extends Game {
         mainSong.setLooping(true);
         deathSong = Gdx.audio.newMusic(Gdx.files.internal("music/deadtrack.mp3"));
         deathSong.setLooping(true);
+
+        font = new BitmapFont(); //or use alex answer to use custom font
+        font.getData().setScale(3, 3);
+
+        timeDisplay = 0;
+
+
+
+
     }
 
     @Override
@@ -85,19 +108,29 @@ public class SnowmanPanicPlay extends Game {
         super.render();
 
 
-        currentTime = System.currentTimeMillis();
 
 
 
-        if(gameState == GameState.MENU && !menuSong.isPlaying()){
-            menuSong.play();
+
+        if(gameState == GameState.MENU){
+            if(deathSong.isPlaying()){
+                deathSong.stop();
+
+            }
+            if(!menuSong.isPlaying()){
+                menuSong.play();
+            }
+
+
         }
 
         if(gameState == GameState.PLAY){
 
+            currentTime = System.currentTimeMillis();
+
             if(menuSong.isPlaying()){
                 menuSong.stop();
-                menuSong.dispose();
+
             }
             if(!mainSong.isPlaying()){
                 mainSong.play();
@@ -108,13 +141,14 @@ public class SnowmanPanicPlay extends Game {
 
             long thisTime = tDelta;
             if(tDelta % 1 == 0 && thisTime != previousTime){
+                timeDisplay++;
                 previousTime = thisTime;
                 if(tDelta % 2 == 0){
                     for(RainDropObject drop : dropList){
                         drop.setSpeed(drop.getSpeed() + 1f);
                     }
                 }
-                if(tDelta % 20 == 0){
+                if(timeDisplay % 20 == 0){
                     dropSnowflake = true;
                     snowflake = new SnowflakeObject("images/snowflake.png", 7, 0, 0, 20, 40);
                     snowflake.getRandomPosition();
@@ -148,6 +182,7 @@ public class SnowmanPanicPlay extends Game {
                     dropSnowflake = false;
                     player.addHealth();
                     snowflakeSound.play();
+                    timeDisplay++;
                 }else if(snowflake.getPosy() <= 0){
                     dropSnowflake = false;
                 }
@@ -167,6 +202,7 @@ public class SnowmanPanicPlay extends Game {
 
                     if(player.getHealth() == 0){
                         gameState = GameState.DEATH;
+                        changeScreen(new DeathScreen(Integer.toString(timeDisplay)));
                     }
                 }
             }
@@ -193,6 +229,7 @@ public class SnowmanPanicPlay extends Game {
             Gdx.gl.glClearColor(.1f, .3f, .5f, 0);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
             batch.begin();
+
             batch.draw(player.getImage(), player.getPosx(), player.getPosy());
             for(RainDropObject drop : dropList){
                 batch.draw(drop.getImage(), drop.getPosx(), drop.getPosy());
@@ -200,15 +237,17 @@ public class SnowmanPanicPlay extends Game {
             if(dropSnowflake == true){
                 batch.draw(snowflake.getImage(), snowflake.getPosx(), snowflake.getPosy());
             }
+            font.draw(batch, Integer.toString(timeDisplay), Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 100);
             batch.end();
         }
 
         if(gameState == GameState.DEATH){
             mainSong.stop();
-            mainSong.dispose();
+
             if(deathSong.isPlaying() == false){
                 deathSong.play();
             }
+
 
 
 
@@ -216,7 +255,26 @@ public class SnowmanPanicPlay extends Game {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
             batch.begin();
             batch.draw(player.getImage(), player.getPosx(), player.getPosy());
+            font.draw(batch, Integer.toString(timeDisplay), Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 100);
             batch.end();
+
+
+        }
+        if(gameState == GameState.RESET){
+            timeDisplay = 0;
+            gameState = GameState.MENU;
+            player = new PlayerObject("images/snowman.png", 12, Gdx.graphics.getWidth()/2 - 156/2, 237 + 50, 156, 237);
+            dropList = new ArrayList();
+            for(int i = 0; i < 7; i++){
+                RainDropObject newDrop = new RainDropObject("images/drop.png", 13, 0, 0, 20, 40);
+                newDrop.getRandomPosition();
+                dropList.add(newDrop);
+            }
+
+            startTime = System.currentTimeMillis();
+            previousTime = 0;
+            changeScreen(new MainMenu());
+
         }
 
 
@@ -247,4 +305,7 @@ public class SnowmanPanicPlay extends Game {
 
         return intersect;
     }
+
+
+
 }
