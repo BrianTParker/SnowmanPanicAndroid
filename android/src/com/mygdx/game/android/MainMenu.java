@@ -38,6 +38,8 @@ public class MainMenu implements Screen {
     SpriteBatch batch;
     Texture topImage;
     Texture bottomImage;
+    Texture snowmanHead1;
+    Texture snowmanHead2;
     URL url;
     SnowmanPanicPlay mainLoop;
     ArrayList<Score> scores;
@@ -57,12 +59,13 @@ public class MainMenu implements Screen {
         batch = new SpriteBatch();
         topImage = new Texture("images/snowmanpanic.png");
         bottomImage = new Texture("images/spacebar.png");
-
+        snowmanHead1 = new Texture("images/snowman_head.png");
+        snowmanHead2 = new Texture("images/snowman_head.png");
 
 
         scores = new ArrayList<Score>();
 
-        font = new BitmapFont(); //or use alex answer to use custom font
+        font = new BitmapFont();
         font.getData().setScale(3, 3);
 
 
@@ -81,7 +84,7 @@ public class MainMenu implements Screen {
                 String name = val.getString("name");
                 String score = val.getString("score");
 
-                Score newScore = new Score(name, score, Gdx.graphics.getWidth()/2 - 250, starPos -= 50, count);
+                Score newScore = new Score(name, score, Gdx.graphics.getWidth()/2 - 150, starPos -= 50, count);
                 scores.add(newScore);
                 count ++;
 
@@ -119,7 +122,9 @@ public class MainMenu implements Screen {
             }
 
             batch.draw(topImage, (Gdx.graphics.getWidth() / 2) - (topImage.getWidth() / 2), Gdx.graphics.getHeight() - topImage.getHeight() - 100);
-            batch.draw(bottomImage, (Gdx.graphics.getWidth()/2) - (bottomImage.getWidth()/2), bottomImage.getHeight() + 100);
+            batch.draw(bottomImage, (Gdx.graphics.getWidth()/2) - (bottomImage.getWidth()/2), bottomImage.getHeight() + 200);
+            batch.draw(snowmanHead1, 50, 500);
+            batch.draw(snowmanHead2, Gdx.graphics.getWidth() - 230, 500);
             batch.end();
         }
 
