@@ -62,6 +62,7 @@ public class SnowmanPanicPlay extends Game {
 
     @Override
     public void create () {
+        Log.d("resolution", Integer.toString(Gdx.graphics.getWidth()) + "," + Gdx.graphics.getHeight());
         gameState = GameState.MENU;
         player = new PlayerObject("images/snowman.png", 12, Gdx.graphics.getWidth()/2 - 156/2, 237 + 50, 156, 237);
         dropList = new ArrayList();
@@ -145,7 +146,10 @@ public class SnowmanPanicPlay extends Game {
                 previousTime = thisTime;
                 if(tDelta % 2 == 0){
                     for(RainDropObject drop : dropList){
-                        drop.setSpeed(drop.getSpeed() + 1f);
+                        if(drop.getSpeed() <= 43){
+                            drop.setSpeed(drop.getSpeed() + 1f);
+                        }
+
                     }
                 }
                 if(timeDisplay % 20 == 0){

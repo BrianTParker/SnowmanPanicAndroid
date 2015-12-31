@@ -1,6 +1,7 @@
 package com.mygdx.game.android;
 
 import android.content.Intent;
+import android.graphics.Camera;
 import android.util.Log;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -9,10 +10,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Json;
@@ -35,11 +39,15 @@ import java.util.LinkedHashMap;
  */
 public class MainMenu implements Screen {
 
+
+
+
     SpriteBatch batch;
     Texture topImage;
     Texture bottomImage;
     Texture snowmanHead1;
     Texture snowmanHead2;
+    Texture topscores;
     URL url;
     SnowmanPanicPlay mainLoop;
     ArrayList<Score> scores;
@@ -61,7 +69,7 @@ public class MainMenu implements Screen {
         bottomImage = new Texture("images/spacebar.png");
         snowmanHead1 = new Texture("images/snowman_head.png");
         snowmanHead2 = new Texture("images/snowman_head.png");
-
+        topscores = new Texture("images/topScores.png");
 
         scores = new ArrayList<Score>();
 
@@ -71,9 +79,12 @@ public class MainMenu implements Screen {
 
 
 
+
+
+
         try {
 
-            String json = readUrl("http://database.bp72520.webfactional.com/get_scores.php");
+            String json = readUrl("");
 
 
 
@@ -84,7 +95,7 @@ public class MainMenu implements Screen {
                 String name = val.getString("name");
                 String score = val.getString("score");
 
-                Score newScore = new Score(name, score, Gdx.graphics.getWidth()/2 - 150, starPos -= 50, count);
+                Score newScore = new Score(name, score, Gdx.graphics.getWidth()/2 - 250, starPos -= 50, count);
                 scores.add(newScore);
                 count ++;
 
@@ -125,6 +136,8 @@ public class MainMenu implements Screen {
             batch.draw(bottomImage, (Gdx.graphics.getWidth()/2) - (bottomImage.getWidth()/2), bottomImage.getHeight() + 200);
             batch.draw(snowmanHead1, 50, 500);
             batch.draw(snowmanHead2, Gdx.graphics.getWidth() - 230, 500);
+            batch.draw(topscores, (Gdx.graphics.getWidth() / 2) - (topscores.getWidth() / 2), Gdx.graphics.getHeight() - topscores.getHeight() - 250);
+
             batch.end();
         }
 

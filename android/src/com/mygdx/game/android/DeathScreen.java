@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLEncoder;
+
 import com.mygdx.game.android.SnowmanPanicPlay.GameState;
 
 /**
@@ -77,10 +79,13 @@ public class DeathScreen implements Screen {
         @Override
         public void input (String text) {
             try {
-                String url = "http://database.bp72520.webfactional.com/insert_score.php?name=" + text + "&score=" + score + "&key=hunter2";
-                url = url.replace(" ", "%20");
+                String encodedString = URLEncoder.encode(text, "UTF-8");
+                String url = "";
+
                 String json = readUrl(url);
                 JSONObject mainObject = new JSONObject(json.trim());
+
+
                 SnowmanPanicPlay.gameState = GameState.RESET;
                 displayNameBox = true;
             } catch (Exception e) {
